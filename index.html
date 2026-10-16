@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gesichter der Geschichte</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,500&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: Zeitstrahl im Maßstab als Einstieg, darunter ein Raster aus Münz-Medaillons; Details im Dialog */
+:root {
+  --bg: #eceeea;
+  --surface: #f8f9f6;
+  --fg: #171b26;
+  --muted: #59606e;
+  --line: #cfd3cc;
+  --lapis: #1f3f8f;
+  --gold: #a87e12;
+  --gold-soft: #e9dcb3;
+  --display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1220; --surface: #161b2c; --fg: #e8e9ee; --muted: #9aa1b4; --line: #2a3147;
+    --lapis: #93abf2; --gold: #e2b94c; --gold-soft: #3a3220; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1220; --surface: #161b2c; --fg: #e8e9ee; --muted: #9aa1b4; --line: #2a3147;
+  --lapis: #93abf2; --gold: #e2b94c; --gold-soft: #3a3220; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 400 1rem/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1180px; margin: 0 auto; }
+
+header.hero { padding-block: 56px 28px; display: grid; gap: 14px; }
+.eyebrow { font: 500 .75rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+h1 {
+  font: 500 clamp(2.6rem, 7vw, 5.4rem)/0.98 var(--display);
+  margin: 0; letter-spacing: -.01em; text-wrap: balance;
+}
+h1 em { font-style: italic; color: var(--lapis); }
+.lede { max-width: 62ch; color: var(--muted); font-size: 1.08rem; margin: 0; }
+
+/* Zeitstrahl */
+.timeline-sec { padding-block: 18px 8px; }
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; margin-bottom: 10px; }
+h2 { font: 500 1.6rem/1.2 var(--display); margin: 0; text-wrap: balance; }
+.hint { font: 400 .8rem/1.4 var(--mono); color: var(--muted); }
+.tl-scroll { overflow-x: auto; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); }
+.tl { position: relative; width: 1600px; padding-block: 14px 34px; }
+.tl-axis { position: absolute; left: 0; right: 0; bottom: 0; height: 30px; }
+.tick { position: absolute; bottom: 0; height: 30px; border-left: 1px solid var(--line); }
+.tick span { position: absolute; left: 4px; bottom: 8px; font: 400 .7rem/1 var(--mono); color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tick.zero { border-left-color: var(--gold); }
+.tick.zero span { color: var(--gold); }
+.lane-bar {
+  position: absolute; height: 20px; display: flex; align-items: center; gap: 6px;
+  background: none; border: 0; padding: 0; cursor: pointer; color: var(--fg); font: 500 .78rem/1 var(--body);
+  white-space: nowrap;
+}
+.lane-bar i { display: block; height: 8px; min-width: 6px; border-radius: 4px; background: var(--lapis); flex: none; }
+.lane-bar:hover i, .lane-bar:focus-visible i { background: var(--gold); }
+.lane-bar:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 3px; }
+.lane-bar.dim { opacity: .22; }
+
+/* Filter */
+.controls { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; padding-block: 36px 18px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font: 500 .85rem/1 var(--body); padding: 9px 14px; border-radius: 999px;
+  border: 1px solid var(--line); background: transparent; color: var(--fg); cursor: pointer;
+}
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.chip:focus-visible, .search input:focus-visible, select:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.search { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; }
+.search input, select {
+  font: 400 .9rem/1 var(--body); padding: 10px 12px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+}
+.search input { width: 220px; max-width: 100%; }
+.count { font: 400 .8rem/1 var(--mono); color: var(--muted); width: 100%; }
+
+/* Raster */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-bottom: 64px; }
+.card {
+  background: var(--surface); border: 0; text-align: left; color: var(--fg); cursor: pointer;
+  padding: 22px 20px 20px; display: grid; grid-template-columns: 64px 1fr; gap: 6px 16px; align-content: start;
+  font: inherit; transition: background .2s;
+}
+.card:hover { background: var(--bg); }
+.card:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.coin {
+  grid-row: span 3; width: 64px; height: 64px; border-radius: 50%;
+  display: grid; place-items: center; position: relative;
+  background: radial-gradient(circle at 35% 30%, var(--gold-soft), transparent 70%), var(--surface);
+  border: 2px solid var(--gold); box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 5px var(--gold);
+  font: 500 1.3rem/1 var(--display); color: var(--gold); letter-spacing: .02em;
+}
+.card .meta { font: 500 .68rem/1.3 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.card h3 { font: 500 1.35rem/1.15 var(--display); margin: 0; text-wrap: balance; }
+.card .life { font: 400 .8rem/1.3 var(--mono); color: var(--lapis); font-variant-numeric: tabular-nums; }
+.card p { grid-column: 1 / -1; margin: 10px 0 0; color: var(--muted); font-size: .92rem; line-height: 1.5; }
+.card .turn { grid-column: 1 / -1; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); font-size: .85rem; display: flex; gap: 10px; }
+.card .turn b { font: 500 .85rem/1.5 var(--mono); color: var(--gold); flex: none; font-variant-numeric: tabular-nums; }
+.empty { background: var(--surface); padding: 40px 20px; color: var(--muted); grid-column: 1 / -1; }
+
+/* Dialog */
+dialog {
+  border: 1px solid var(--line); border-radius: 14px; padding: 0; width: min(640px, calc(100% - 32px));
+  background: var(--surface); color: var(--fg); max-height: calc(100% - 48px);
+}
+dialog::backdrop { background: rgba(10, 14, 26, .55); }
+.dlg { padding: 28px 26px 24px; display: grid; gap: 14px; }
+.dlg-top { display: grid; grid-template-columns: 76px 1fr; gap: 18px; align-items: center; }
+.dlg-top .coin { width: 76px; height: 76px; font-size: 1.6rem; grid-row: auto; }
+.dlg h3 { font: 500 2rem/1.05 var(--display); margin: 4px 0 6px; text-wrap: balance; }
+.dlg .life { font: 400 .85rem/1.3 var(--mono); color: var(--lapis); }
+.dlg p { margin: 0; max-width: 62ch; }
+.dlg ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
+.dlg li::marker { color: var(--gold); }
+.dlg .turn { background: var(--bg); border-radius: 10px; padding: 14px 16px; display: grid; gap: 4px; }
+.dlg .turn b { font: 500 1.4rem/1 var(--mono); color: var(--gold); }
+.dlg-foot { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding-top: 6px; }
+.btn {
+  font: 500 .88rem/1 var(--body); padding: 10px 14px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--line); background: transparent; color: var(--fg);
+}
+.btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+footer { border-top: 1px solid var(--line); padding-block: 22px 40px; color: var(--muted); font-size: .85rem; }
+
+@media (max-width: 640px) {
+  header.hero { padding-block: 36px 20px; }
+  .search { margin-left: 0; width: 100%; }
+  .search input { flex: 1; }
+  .dlg { padding: 22px 18px 18px; }
+  .dlg-top { grid-template-columns: 60px 1fr; }
+  .dlg-top .coin { width: 60px; height: 60px; font-size: 1.3rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<style>body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">551 v. Chr. – 2013 n. Chr.</div>
+    <h1>Gesichter der <em>Geschichte</em></h1>
+    <p class="lede">24 Menschen, die verändert haben, wie wir denken, glauben, regieren und forschen. Von Konfuzius bis Nelson Mandela: Lebensdaten, der entscheidende Wendepunkt und warum ihr Werk bis heute nachwirkt.</p>
+  </header>
+
+  <section class="timeline-sec" aria-labelledby="tl-h">
+    <div class="sec-head">
+      <h2 id="tl-h">Lebensspannen im Maßstab</h2>
+      <span class="hint">1 Pixel ≈ 1,6 Jahre · seitlich scrollen · Balken antippen</span>
+    </div>
+    <div class="tl-scroll"><div class="tl" id="tl"></div></div>
+  </section>
+
+  <section aria-labelledby="list-h">
+    <div class="controls">
+      <h2 id="list-h" style="width:100%">Alle Persönlichkeiten</h2>
+      <div class="chips" id="chips" role="group" aria-label="Nach Bereich filtern"></div>
+      <div class="search">
+        
+        <input id="q" type="search" aria-label="Suche" placeholder="Name oder Land suchen" autocomplete="off">
+        <select id="sort" aria-label="Sortierung">
+          <option value="chrono">Chronologisch</option>
+          <option value="alpha">Alphabetisch</option>
+          <option value="age">Nach Lebensalter</option>
+        </select>
+      </div>
+      <div class="count" id="count" aria-live="polite"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <footer>Jahresangaben vor Christus sind teils überliefert oder geschätzt und mit „um“ gekennzeichnet. Die Auswahl ist eine Zusammenstellung und keine Rangliste.</footer>
+</div>
+
+<dialog id="dlg" aria-labelledby="d-name">
+  <div class="dlg" id="dlg-body"></div>
+</dialog>
+
+<script>
+const P = [
+  { n:"Konfuzius", b:-551, d:-479, c:"Philosophie", r:"China", k:"Lehrer der Menschlichkeit",
+    t:"Konfuzius lehrte eine Ethik aus Menschlichkeit (ren), Ritual und Respekt innerhalb der Familie. Seine Schüler sammelten seine Aussprüche in den „Gesprächen“ (Lunyu). Unter der Han-Dynastie wurde der Konfuzianismus zur Staatslehre und prägte China, Korea, Japan und Vietnam über zwei Jahrtausende.",
+    w:[-497,"Verlässt den Staat Lu und zieht als Wanderlehrer durch China"],
+    f:["Beamtenprüfungen in China fußten bis 1905 auf konfuzianischen Klassikern","Sein Familienname Kong wird bis heute in direkter Linie weitergeführt"] , ca:true },
+  { n:"Sokrates", b:-469, d:-399, c:"Philosophie", r:"Athen", k:"Fragen als Methode",
+    t:"Sokrates schrieb kein einziges Buch. Wir kennen ihn durch seine Schüler Platon und Xenophon. Seine Methode, durch beharrliches Fragen scheinbares Wissen zu prüfen, gilt als Grundstein der westlichen Philosophie.",
+    w:[-399,"Wird wegen Gottlosigkeit und Verführung der Jugend zum Tod verurteilt und trinkt den Schierlingsbecher"],
+    f:["Die „sokratische Methode“ wird heute noch in Jura- und Lehrerausbildung genutzt","Platons „Apologie“ überliefert seine Verteidigungsrede"], ca:true },
+  { n:"Alexander der Große", b:-356, d:-323, c:"Herrschaft", r:"Makedonien", k:"Reich bis zum Indus",
+    t:"In nur elf Jahren schuf Alexander ein Reich von Griechenland über Ägypten und Persien bis an den Indus. Mit ihm begann der Hellenismus, in dem sich griechische und orientalische Kultur verbanden.",
+    w:[-331,"Besiegt den Perserkönig Dareios III. bei Gaugamela"],
+    f:["Gründete zahlreiche Städte namens Alexandria, die bekannteste in Ägypten","Starb mit 32 Jahren in Babylon"] },
+  { n:"Gaius Julius Caesar", b:-100, d:-44, c:"Herrschaft", r:"Rom", k:"Ende der Republik",
+    t:"Feldherr, Politiker und Autor. Caesar eroberte Gallien, gewann den Bürgerkrieg und regierte als Diktator auf Lebenszeit. Seine Ermordung beschleunigte den Übergang der Römischen Republik zum Kaiserreich.",
+    w:[-49,"Überschreitet mit seinen Truppen den Rubikon und löst den Bürgerkrieg aus"],
+    f:["Sein Kalender, der julianische, galt in Europa über 1600 Jahre","Aus seinem Namen wurden die Titel „Kaiser“ und „Zar“"] },
+  { n:"Kleopatra VII.", b:-69, d:-30, c:"Herrschaft", r:"Ägypten", k:"Letzte Pharaonin",
+    t:"Die letzte Herrscherin des Ptolemäerreichs sicherte Ägyptens Unabhängigkeit durch Bündnisse mit Caesar und Marcus Antonius. Nach ihrem Tod wurde Ägypten römische Provinz.",
+    w:[-31,"Niederlage gegen Octavian in der Seeschlacht bei Actium"],
+    f:["Laut Plutarch die erste Ptolemäerin, die Ägyptisch sprach","Lebte zeitlich näher an der Mondlandung als am Bau der Cheops-Pyramide"] },
+  { n:"Karl der Große", b:748, d:814, c:"Herrschaft", r:"Frankenreich", k:"Vater Europas",
+    t:"Karl vereinte große Teile West- und Mitteleuropas im Frankenreich. Er förderte Bildung, Klosterschulen und die Abschrift antiker Texte, die sogenannte karolingische Renaissance.",
+    w:[800,"Wird am Weihnachtstag in Rom von Papst Leo III. zum Kaiser gekrönt"],
+    f:["Die karolingische Minuskel ist die Vorlage unserer heutigen Kleinbuchstaben","Seine Pfalzkapelle ist Kern des Aachener Doms"], ca:true },
+  { n:"Dschingis Khan", b:1162, d:1227, c:"Herrschaft", r:"Mongolei", k:"Größtes Landreich",
+    t:"Temüdschin einte die zerstrittenen Steppenvölker und begründete das Mongolische Reich. Unter seinen Nachfolgern wurde es zum größten zusammenhängenden Landreich der Geschichte, von Korea bis Osteuropa.",
+    w:[1206,"Wird auf einer Versammlung der Stämme zum Großkhan ausgerufen"],
+    f:["Baute ein Netz aus Poststationen (Jam) für schnelle Nachrichten","Seine Eroberungen kosteten Millionen Menschen das Leben"], ca:true },
+  { n:"Johannes Gutenberg", b:1400, d:1468, c:"Erfindung", r:"Mainz", k:"Buchdruck",
+    t:"Gutenberg entwickelte den Druck mit beweglichen Metalllettern samt Gießinstrument, Druckfarbe und Presse. Bücher wurden dadurch billiger, schneller und in großer Zahl verfügbar.",
+    w:[1454,"Die Gutenberg-Bibel ist fertig gedruckt, rund 180 Exemplare"],
+    f:["Etwa 49 Exemplare der Bibel sind heute erhalten","Ohne den Buchdruck hätte sich die Reformation kaum so schnell verbreitet"], ca:true },
+  { n:"Christoph Kolumbus", b:1451, d:1506, c:"Entdeckung", r:"Genua", k:"Atlantiküberquerung",
+    t:"Im Auftrag der spanischen Krone suchte Kolumbus einen Westweg nach Asien und erreichte die Karibik. Seine Reisen leiteten die europäische Kolonisierung Amerikas ein, mit verheerenden Folgen für die indigene Bevölkerung.",
+    w:[1492,"Landet auf der Bahamas-Insel Guanahaní"],
+    f:["Unternahm insgesamt vier Reisen über den Atlantik","Hielt bis zu seinem Tod daran fest, Asien erreicht zu haben"] },
+  { n:"Leonardo da Vinci", b:1452, d:1519, c:"Kunst", r:"Florenz", k:"Universalgenie",
+    t:"Maler, Bildhauer, Ingenieur und Naturforscher. Leonardo schuf mit „Das Abendmahl“ und der „Mona Lisa“ Ikonen der Kunst und füllte Notizbücher mit Studien zu Anatomie, Wasser, Flug und Maschinen.",
+    w:[1503,"Beginnt die Arbeit an der Mona Lisa"],
+    f:["Rund 7000 Seiten seiner Notizen sind erhalten, viele in Spiegelschrift","Sezierte Leichen für präzise anatomische Zeichnungen"] },
+  { n:"Martin Luther", b:1483, d:1546, c:"Religion", r:"Sachsen", k:"Reformation",
+    t:"Luther kritisierte den Ablasshandel und stellte die Bibel über die Autorität der Kirche. Daraus entstand die Reformation, die Europa religiös und politisch spaltete.",
+    w:[1517,"Veröffentlicht in Wittenberg seine 95 Thesen"],
+    f:["Seine Bibelübersetzung prägte die neuhochdeutsche Schriftsprache","Der 31. Oktober ist in mehreren Bundesländern Feiertag"] },
+  { n:"Elisabeth I.", b:1533, d:1603, c:"Herrschaft", r:"England", k:"Goldenes Zeitalter",
+    t:"Als Königin von England regierte Elisabeth über 44 Jahre. Ihre Herrschaft brachte politische Stabilität, festigte die anglikanische Kirche und fiel mit der Blüte des Theaters um Shakespeare zusammen.",
+    w:[1588,"Englands Flotte schlägt die spanische Armada"],
+    f:["Blieb unverheiratet und wurde „Virgin Queen“ genannt","Der US-Bundesstaat Virginia ist nach ihr benannt"] },
+  { n:"Galileo Galilei", b:1564, d:1642, c:"Wissenschaft", r:"Pisa", k:"Blick durchs Fernrohr",
+    t:"Galilei verband Experiment und Mathematik zur modernen Naturwissenschaft. Mit dem Fernrohr entdeckte er Jupitermonde und Venusphasen und stützte damit das heliozentrische Weltbild.",
+    w:[1610,"Veröffentlicht den „Sidereus Nuncius“ mit seinen Himmelsbeobachtungen"],
+    f:["Wurde 1633 von der Inquisition zum Widerruf gezwungen","Die vier größten Jupitermonde heißen bis heute „Galileische Monde“"] },
+  { n:"Isaac Newton", b:1643, d:1727, c:"Wissenschaft", r:"England", k:"Gesetze der Bewegung",
+    t:"Newton formulierte die Bewegungsgesetze und das Gravitationsgesetz und erklärte damit Fallbewegung und Planetenbahnen mit denselben Regeln. Er entwickelte die Infinitesimalrechnung, unabhängig von Leibniz.",
+    w:[1687,"Erscheinen der „Principia Mathematica“"],
+    f:["Baute das erste funktionsfähige Spiegelteleskop","Die Einheit der Kraft, das Newton, trägt seinen Namen"] },
+  { n:"Katharina die Große", b:1729, d:1796, c:"Herrschaft", r:"Russland", k:"Aufgeklärte Zarin",
+    t:"Geboren als Prinzessin Sophie von Anhalt-Zerbst in Stettin, wurde sie die am längsten regierende Zarin Russlands. Sie dehnte das Reich bis ans Schwarze Meer aus und förderte Kunst und Bildung.",
+    w:[1762,"Übernimmt durch einen Staatsstreich gegen ihren Ehemann die Macht"],
+    f:["Stand im Briefwechsel mit Voltaire und Diderot","Legte mit ihrer Sammlung den Grundstein der Eremitage"] },
+  { n:"Napoleon Bonaparte", b:1769, d:1821, c:"Herrschaft", r:"Frankreich", k:"Kaiser und Gesetzgeber",
+    t:"Der Offizier aus Korsika stieg nach der Revolution zum Kaiser der Franzosen auf und beherrschte große Teile Europas. Sein Gesetzbuch, der Code civil, beeinflusst Rechtssysteme bis heute.",
+    w:[1804,"Krönt sich in Notre-Dame zum Kaiser, im selben Jahr tritt der Code civil in Kraft"],
+    f:["Niederlage bei Waterloo 1815","Starb im Exil auf der Atlantikinsel St. Helena"] },
+  { n:"Ludwig van Beethoven", b:1770, d:1827, c:"Kunst", r:"Bonn", k:"Brücke zur Romantik",
+    t:"Beethoven führte die Wiener Klassik an ihre Grenzen und öffnete den Weg zur Romantik. Viele seiner bedeutendsten Werke komponierte er, als er bereits fast oder ganz taub war.",
+    w:[1824,"Uraufführung der 9. Sinfonie in Wien"],
+    f:["Die „Ode an die Freude“ ist die Hymne der Europäischen Union","Schrieb 9 Sinfonien und 32 Klaviersonaten"] },
+  { n:"Abraham Lincoln", b:1809, d:1865, c:"Herrschaft", r:"USA", k:"Ende der Sklaverei",
+    t:"Als 16. Präsident der USA führte Lincoln die Union durch den Bürgerkrieg und erhielt die Einheit des Landes. Er trieb die Abschaffung der Sklaverei voran.",
+    w:[1863,"Emanzipationsproklamation und Rede von Gettysburg"],
+    f:["Der 13. Verfassungszusatz verbot 1865 die Sklaverei","Wurde wenige Tage nach Kriegsende ermordet"] },
+  { n:"Charles Darwin", b:1809, d:1882, c:"Wissenschaft", r:"England", k:"Evolution",
+    t:"Auf der Weltreise mit der HMS Beagle sammelte Darwin Beobachtungen, die ihn zur Theorie der Evolution durch natürliche Selektion führten. Sie ist bis heute das Fundament der Biologie.",
+    w:[1859,"„Über die Entstehung der Arten“ erscheint"],
+    f:["Die Beagle-Reise dauerte von 1831 bis 1836","Am selben Tag geboren wie Abraham Lincoln: 12. Februar 1809"] },
+  { n:"Marie Curie", b:1867, d:1934, c:"Wissenschaft", r:"Warschau", k:"Radioaktivität",
+    t:"Die in Warschau geborene Physikerin erforschte in Paris die Radioaktivität und entdeckte mit Pierre Curie die Elemente Polonium und Radium.",
+    w:[1898,"Entdeckung von Polonium und Radium"],
+    f:["Erste Frau mit einem Nobelpreis (Physik 1903)","Bis heute einzige Person mit Nobelpreisen in zwei Naturwissenschaften (Chemie 1911)"] },
+  { n:"Mahatma Gandhi", b:1869, d:1948, c:"Politik", r:"Indien", k:"Gewaltfreier Widerstand",
+    t:"Gandhi führte die indische Unabhängigkeitsbewegung mit gewaltlosem Widerstand (Satyagraha). Seine Methoden inspirierten Bürgerrechtsbewegungen auf der ganzen Welt.",
+    w:[1930,"Salzmarsch: fast 400 km zu Fuß gegen das britische Salzmonopol"],
+    f:["Indien wurde 1947 unabhängig","Wurde 1948 in Neu-Delhi ermordet"] },
+  { n:"Albert Einstein", b:1879, d:1955, c:"Wissenschaft", r:"Ulm", k:"Relativitätstheorie",
+    t:"Einstein veränderte unser Verständnis von Raum, Zeit und Schwerkraft. Seine Relativitätstheorien sind heute Grundlage etwa für die Genauigkeit der GPS-Satelliten.",
+    w:[1905,"„Wunderjahr“: vier bahnbrechende Arbeiten, darunter E = mc²"],
+    f:["Nobelpreis 1921 für die Erklärung des Photoeffekts","Allgemeine Relativitätstheorie 1915"] },
+  { n:"Nelson Mandela", b:1918, d:2013, c:"Politik", r:"Südafrika", k:"Versöhnung",
+    t:"Mandela kämpfte gegen die Apartheid und verbrachte dafür 27 Jahre in Haft. Nach seiner Freilassung führte er Südafrika in die Demokratie und setzte auf Versöhnung statt Vergeltung.",
+    w:[1994,"Wird erster schwarzer Präsident Südafrikas"],
+    f:["Friedensnobelpreis 1993","Sein Geburtstag, der 18. Juli, ist UN-Gedenktag"] },
+  { n:"Martin Luther King Jr.", b:1929, d:1968, c:"Politik", r:"USA", k:"Bürgerrechte",
+    t:"Der Baptistenpastor wurde zur Stimme der US-Bürgerrechtsbewegung. Mit gewaltfreien Protesten trug er dazu bei, die Rassentrennung gesetzlich zu beenden.",
+    w:[1963,"Rede „I Have a Dream“ beim Marsch auf Washington"],
+    f:["Friedensnobelpreis 1964, mit 35 Jahren damals der jüngste Preisträger","Wurde 1968 in Memphis ermordet"] }
+];
+
+const CATS = ["Alle","Herrschaft","Politik","Wissenschaft","Philosophie","Religion","Kunst","Erfindung","Entdeckung"];
+const yr = y => y < 0 ? `${-y} v. Chr.` : `${y}`;
+const life = p => `${p.ca ? "um " : ""}${yr(p.b)} – ${yr(p.d)}`;
+const age = p => p.d - p.b - (p.b < 0 && p.d > 0 ? 1 : 0);
+const initials = n => n.replace(/(der|die|Jr\.|VII\.|I\.)/g,"").split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join("");
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let cat = "Alle", query = "", sort = "chrono";
+
+/* Zeitstrahl */
+const MIN = -600, MAX = 2050, W = 1600, PAD = 20;
+const x = y => PAD + (y - MIN) / (MAX - MIN) * (W - 2 * PAD);
+function buildTimeline() {
+  const tl = document.getElementById("tl");
+  const sorted = [...P].sort((a,b)=>a.b-b.b);
+  const lanes = [];
+  const bars = sorted.map(p => {
+    const x0 = x(p.b), x1 = x(p.d), end = x1 + 8 + p.n.length * 6.6;
+    let lane = lanes.findIndex(e => e + 14 < x0);
+    if (lane === -1) { lane = lanes.length; lanes.push(0); }
+    lanes[lane] = end;
+    return { p, x0, w: Math.max(6, x1 - x0), lane };
+  });
+  const LH = 26;
+  tl.style.height = (lanes.length * LH + 14 + 34) + "px";
+  let html = '<div class="tl-axis">';
+  for (let y = -500; y <= 2000; y += 250) {
+    html += `<div class="tick${y===0?" zero":""}" style="left:${x(y)}px"><span>${y===0?"Zeitenwende":yr(y)}</span></div>`;
+  }
+  html += "</div>";
+  for (const b of bars) {
+    html += `<button class="lane-bar" data-n="${esc(b.p.n)}" style="left:${b.x0}px;top:${14 + b.lane*LH}px" aria-label="${esc(b.p.n)}, ${life(b.p)}"><i style="width:${b.w}px"></i>${esc(b.p.n)}</button>`;
+  }
+  tl.innerHTML = html;
+}
+
+function filtered() {
+  const q = query.trim().toLowerCase();
+  let list = P.filter(p => (cat === "Alle" || p.c === cat) &&
+    (!q || (p.n + " " + p.r + " " + p.k).toLowerCase().includes(q)));
+  if (sort === "alpha") list.sort((a,b)=>a.n.localeCompare(b.n,"de"));
+  else if (sort === "age") list.sort((a,b)=>age(b)-age(a));
+  else list.sort((a,b)=>a.b-b.b);
+  return list;
+}
+
+function render() {
+  const list = filtered();
+  const names = new Set(list.map(p=>p.n));
+  document.querySelectorAll(".lane-bar").forEach(el => el.classList.toggle("dim", !names.has(el.dataset.n)));
+  document.getElementById("count").textContent = `${list.length} von ${P.length} Persönlichkeiten`;
+  document.getElementById("grid").innerHTML = list.length ? list.map(p => `
+    <button class="card" data-n="${esc(p.n)}">
+      <span class="coin" aria-hidden="true">${initials(p.n)}</span>
+      <span class="meta">${p.c} · ${esc(p.r)}</span>
+      <h3>${esc(p.n)}</h3>
+      <span class="life">${life(p)} · ≈ ${age(p)} Jahre</span>
+      <p>${esc(p.k)}</p>
+      <span class="turn"><b>${yr(p.w[0])}</b><span>${esc(p.w[1])}</span></span>
+    </button>`).join("") : `<div class="empty">Keine Treffer. Ändere den Suchbegriff oder wähle „Alle“.</div>`;
+}
+
+function chips() {
+  const el = document.getElementById("chips");
+  el.innerHTML = CATS.filter(c => c==="Alle" || P.some(p=>p.c===c))
+    .map(c => `<button class="chip" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join("");
+}
+
+const dlg = document.getElementById("dlg");
+function open(name) {
+  const order = [...P].sort((a,b)=>a.b-b.b);
+  const i = order.findIndex(p=>p.n===name), p = order[i];
+  const prev = order[i-1], next = order[i+1];
+  document.getElementById("dlg-body").innerHTML = `
+    <div class="dlg-top">
+      <span class="coin" aria-hidden="true">${initials(p.n)}</span>
+      <div><div class="eyebrow">${p.c} · ${esc(p.r)}</div><h3 id="d-name">${esc(p.n)}</h3><div class="life">${life(p)} · ≈ ${age(p)} Jahre</div></div>
+    </div>
+    <p>${esc(p.t)}</p>
+    <div class="turn"><span class="eyebrow">Wendepunkt</span><b>${yr(p.w[0])}</b><span>${esc(p.w[1])}</span></div>
+    <ul>${p.f.map(f=>`<li>${esc(f)}</li>`).join("")}</ul>
+    <div class="dlg-foot">
+      <span style="display:flex;gap:8px;flex-wrap:wrap">
+        ${prev?`<button class="btn" data-go="${esc(prev.n)}">← ${esc(prev.n)}</button>`:""}
+        ${next?`<button class="btn" data-go="${esc(next.n)}">${esc(next.n)} →</button>`:""}
+      </span>
+      <button class="btn primary" id="close">Schließen</button>
+    </div>`;
+  if (!dlg.open) dlg.showModal();
+  document.getElementById("close").focus();
+}
+
+dlg.addEventListener("click", e => {
+  if (e.target === dlg || e.target.id === "close") return dlg.close();
+  const go = e.target.closest("[data-go]"); if (go) open(go.dataset.go);
+});
+document.getElementById("grid").addEventListener("click", e => { const c = e.target.closest(".card"); if (c) open(c.dataset.n); });
+document.getElementById("tl").addEventListener("click", e => { const c = e.target.closest(".lane-bar"); if (c) open(c.dataset.n); });
+document.getElementById("chips").addEventListener("click", e => {
+  const c = e.target.closest(".chip"); if (!c) return; cat = c.dataset.c; chips(); render();
+});
+document.getElementById("q").addEventListener("input", e => { query = e.target.value; render(); });
+document.getElementById("sort").addEventListener("change", e => { sort = e.target.value; render(); });
+
+buildTimeline(); chips(); render();
+</script>
+</body>
+</html>
