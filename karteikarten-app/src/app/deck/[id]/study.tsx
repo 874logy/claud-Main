@@ -59,7 +59,7 @@ export default function StudyScreen() {
         <Text style={[styles.doneText, { color: c.muted }]}>
           {total === 0
             ? 'In diesem Stapel ist gerade nichts fällig.'
-            : `${stats.known} von ${total} Antworten gewusst. Wiederholte Karten kommen nach Plan wieder: morgen, in 3, 7, 14 und 30 Tagen.`}
+            : `${stats.known} von ${total} Antworten gewusst. Nicht gewusste Karten kommen morgen wieder, gewusste nach 3, 7, 14 oder 30 Tagen.`}
         </Text>
         <Button label="Zurück zum Stapel" onPress={() => router.back()} style={styles.doneButton} />
       </View>

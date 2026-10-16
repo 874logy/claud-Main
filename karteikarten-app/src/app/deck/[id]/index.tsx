@@ -74,7 +74,7 @@ export default function DeckScreen() {
               ))}
             </View>
             <Text style={[styles.hint, { color: c.muted }]}>
-              Gewusste Karten wandern ein Fach weiter und kommen seltener dran. Fach 5 heißt: sitzt.
+              Gewusste Karten wandern ein Fach weiter und kommen nach 3, 7, 14 und 30 Tagen wieder. Nicht gewusste kommen morgen wieder. Fach 5 heißt: sitzt.
             </Text>
             <Button
               label={due > 0 ? `Lernen · ${due} fällig` : 'Heute nichts fällig'}

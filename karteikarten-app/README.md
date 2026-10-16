@@ -5,7 +5,7 @@ Lern-App für iOS und Android, gebaut mit Expo (SDK 58) und Expo Router.
 ## Funktionen
 
 - Stapel anlegen und löschen, Karten mit Vorder- und Rückseite anlegen, bearbeiten und löschen
-- Lernen mit dem Leitner-System: Gewusste Karten wandern ein Fach weiter und kommen später wieder (morgen, in 3, 7, 14 und 30 Tagen). Nicht gewusste Karten gehen zurück in Fach 1 und kommen in derselben Runde noch einmal.
+- Lernen mit dem Leitner-System: Gewusste Karten wandern ein Fach weiter und kommen nach 3, 7, 14 und 30 Tagen wieder. Nicht gewusste Karten gehen zurück in Fach 1, kommen in derselben Runde noch einmal und am nächsten Tag wieder.
 - Karten drehen sich beim Antippen um, mit Vibrations-Feedback
 - Fortschritt pro Fach und fällige Karten auf einen Blick
 - Alle Daten liegen lokal auf dem Gerät (SQLite) und funktionieren offline

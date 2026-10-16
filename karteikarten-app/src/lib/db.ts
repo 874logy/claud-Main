@@ -16,7 +16,7 @@ export type Card = {
   due_at: number;
 };
 
-// Leitner-System: Fach 1 = täglich, danach wachsende Abstände (in Tagen).
+// Leitner-System: Abstand in Tagen bis zur nächsten Abfrage, je Fach (Index = Fach).
 export const BOX_INTERVAL_DAYS = [0, 1, 3, 7, 14, 30];
 export const MAX_BOX = BOX_INTERVAL_DAYS.length - 1;
 const DAY_MS = 24 * 60 * 60 * 1000;
