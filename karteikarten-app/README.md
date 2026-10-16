@@ -1,0 +1,45 @@
+# Karteikarten
+
+Lern-App für iOS und Android, gebaut mit Expo (SDK 58) und Expo Router.
+
+## Funktionen
+
+- Stapel anlegen und löschen, Karten mit Vorder- und Rückseite anlegen, bearbeiten und löschen
+- Lernen mit dem Leitner-System: Gewusste Karten wandern ein Fach weiter und kommen später wieder (morgen, in 3, 7, 14 und 30 Tagen). Nicht gewusste Karten gehen zurück in Fach 1 und kommen in derselben Runde noch einmal.
+- Karten drehen sich beim Antippen um, mit Vibrations-Feedback
+- Fortschritt pro Fach und fällige Karten auf einen Blick
+- Alle Daten liegen lokal auf dem Gerät (SQLite) und funktionieren offline
+- Heller und dunkler Modus
+- Ein Beispielstapel „Geschichte“ ist beim ersten Start schon angelegt
+
+## Starten
+
+```bash
+cd karteikarten-app
+npm install
+npx expo start
+```
+
+Dann den QR-Code mit der App **Expo Go** scannen (iOS: Kamera-App, Android: in Expo Go).
+
+## Prüfen
+
+```bash
+npm run typecheck
+```
+
+## Aufbau
+
+```
+src/
+  app/                  Bildschirme (Expo Router)
+    _layout.tsx         Navigation, Datenbank, Farbschema
+    index.tsx           Übersicht aller Stapel
+    deck/new.tsx        Neuen Stapel anlegen
+    deck/[id]/index.tsx Stapel: Fortschritt und Kartenliste
+    deck/[id]/card.tsx  Karte anlegen oder bearbeiten
+    deck/[id]/study.tsx Lernmodus
+  components/Button.tsx
+  lib/db.ts             Datenbank und Leitner-Logik
+  lib/theme.ts          Farben für hell und dunkel
+```
