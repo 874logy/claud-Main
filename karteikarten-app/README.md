@@ -43,3 +43,22 @@ src/
   lib/db.ts             Datenbank und Leitner-Logik
   lib/theme.ts          Farben für hell und dunkel
 ```
+
+## iPhone-App bauen (TestFlight / App Store)
+
+Voraussetzungen: ein kostenloses [Expo-Konto](https://expo.dev/signup) und ein Apple-Developer-Konto (99 $ pro Jahr). Ein Mac ist nicht nötig, gebaut wird in der Cloud.
+
+1. Die Bundle-ID in `app.json` (`ios.bundleIdentifier`, derzeit `com.logy.karteikarten`) bei Bedarf auf eine eigene, weltweit eindeutige ID ändern.
+2. Bauen:
+   ```bash
+   npx eas-cli@latest login
+   npx eas-cli@latest build --platform ios --profile production
+   ```
+   Beim ersten Mal fragt EAS nach dem Apple-Login und legt Zertifikat und Provisioning-Profil automatisch an.
+3. An TestFlight senden:
+   ```bash
+   npx eas-cli@latest submit --platform ios --latest
+   ```
+   Danach erscheint die App in App Store Connect unter TestFlight und lässt sich auf dem iPhone installieren.
+
+Das Profil `preview` erstellt stattdessen eine Version zur direkten Installation auf registrierten Geräten (Ad-hoc).

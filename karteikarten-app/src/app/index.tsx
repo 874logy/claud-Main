@@ -27,6 +27,7 @@ export default function DeckListScreen() {
       <FlatList
         data={decks}
         keyExtractor={(d) => String(d.id)}
+        contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <Text style={[styles.summary, { color: c.muted }]}>
